@@ -1,0 +1,96 @@
+name: "Cleanup Terraform State"
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_cleanup:
+        description: 'Type "CLEANUP" to confirm state cleanup'
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_VERSION: "1.5.7"
+  TF_WORKING_DIR: "infra/envs/dev"
+
+jobs:
+  cleanup:
+    name: "Cleanup State"
+    runs-on: ubuntu-latest
+    environment: dev
+    
+    steps:
+      - name: "Check Confirmation"
+        run: |
+          if [ "${{ github.event.inputs.confirm_cleanup }}" != "CLEANUP" ]; then
+            echo "❌ Confirmation failed. Type 'CLEANUP' to proceed."
+            exit 1
+          fi
+          echo "✅ Confirmation received. Proceeding with state cleanup."
+
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Setup Terraform"
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: "Authenticate to GCP via OIDC"
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+          audience: "https://token.actions.githubusercontent.com"
+
+      - name: "Setup Cloud SDK"
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: "Create terraform.tfvars"
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          cp terraform.tfvars.example terraform.tfvars
+          sed -i "s/^org_id\s*=.*/org_id = \"${{ secrets.ORG_ID }}\"/" terraform.tfvars
+          sed -i "s/^billing_account\s*=.*/billing_account = \"${{ secrets.BILLING_ACCOUNT }}\"/" terraform.tfvars
+          # Ensure labels use underscores instead of hyphens
+          sed -i 's/cost-center/cost_center/g' terraform.tfvars
+          sed -i 's/managed-by/managed_by/g' terraform.tfvars
+
+      - name: "Terraform Init"
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ secrets.TF_STATE_BUCKET }}" \
+            -backend-config="prefix=${{ secrets.TF_STATE_PREFIX }}"
+
+      - name: "Show Current State"
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          echo "Current Terraform state:"
+          terraform state list
+
+      - name: "Remove Problematic Resources from State"
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          echo "Removing problematic Workload Identity resources from state..."
+          
+          # Remove these resources if they exist in state
+          terraform state rm module.iam.google_service_account_iam_binding.workload_identity_binding[0] 2>/dev/null || echo "No workload identity binding in state"
+          terraform state rm module.iam.google_iam_workload_identity_pool_provider.github_actions[0] 2>/dev/null || echo "No workload identity provider in state"
+          terraform state rm module.iam.google_iam_workload_identity_pool.github_actions[0] 2>/dev/null || echo "No workload identity pool in state"
+          
+          echo "State cleanup completed!"
+
+      - name: "Show Updated State"
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          echo "Updated Terraform state:"
+          terraform state list
+
+      - name: "Cleanup Complete"
+        run: |
+          echo "✅ State cleanup completed successfully!"
+          echo "You can now run the main Terraform Apply workflow."
