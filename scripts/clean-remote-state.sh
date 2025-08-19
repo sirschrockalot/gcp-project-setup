@@ -56,7 +56,9 @@ echo ""
 print_info "Initializing Terraform with remote backend..."
 
 # Initialize Terraform (this will connect to the remote GCS state)
-terraform init
+terraform init \
+  -backend-config="bucket=tfstate-presidentialdigs-dev" \
+  -backend-config="prefix=terraform/state"
 
 echo ""
 print_info "Current remote state resources:"
