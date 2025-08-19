@@ -35,6 +35,7 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SA_EMAIL }}
+          audience: "https://token.actions.githubusercontent.com"
 
       - name: "Setup Cloud SDK"
         uses: google-github-actions/setup-gcloud@v2
