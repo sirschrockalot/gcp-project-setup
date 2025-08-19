@@ -13,7 +13,7 @@ zones           = ["us-central1-a", "us-central1-b", "us-central1-c"]
 # Labels (these will be applied to all resources)
 labels = {
   env         = "dev"
-  owner       = "joel.schrock"
+  owner       = "joel-schrock"
   application = "presidentialdigs"
   cost_center = "cc-001"
   managed_by  = "terraform"
