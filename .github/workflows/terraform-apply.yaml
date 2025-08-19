@@ -60,6 +60,8 @@ jobs:
           # Ensure labels use underscores instead of hyphens
           sed -i 's/cost-center/cost_center/g' terraform.tfvars
           sed -i 's/managed-by/managed_by/g' terraform.tfvars
+          # Disable CI service account creation (managed manually)
+          sed -i 's/^enable_ci_service_account\s*=.*/enable_ci_service_account = false/' terraform.tfvars
 
       - name: "Terraform Init"
         working-directory: ${{ env.TF_WORKING_DIR }}
