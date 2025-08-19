@@ -39,6 +39,13 @@ jobs:
       - name: "Setup Cloud SDK"
         uses: google-github-actions/setup-gcloud@v2
 
+      - name: "Create terraform.tfvars"
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          cp terraform.tfvars.example terraform.tfvars
+          sed -i "s/^org_id\s*=.*/org_id = \"${{ secrets.ORG_ID }}\"/" terraform.tfvars
+          sed -i "s/^billing_account\s*=.*/billing_account = \"${{ secrets.BILLING_ACCOUNT }}\"/" terraform.tfvars
+
       - name: "Terraform Init"
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
