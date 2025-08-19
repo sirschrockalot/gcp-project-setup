@@ -1,0 +1,116 @@
+# Organization and Billing Configuration
+org_id          = "123456789012"  # Replace with your actual organization ID
+billing_account = "ABCD-12EF-3456"  # Replace with your actual billing account ID
+
+# Project Configuration
+project_id      = "presidentialdigs-dev"
+project_name    = "Presidential Digs Development"
+
+# Region and Zones Configuration
+region          = "us-central1"
+zones           = ["us-central1-a", "us-central1-b", "us-central1-c"]
+
+# Labels (these will be applied to all resources)
+labels = {
+  env         = "dev"
+  owner       = "joel.schrock"
+  application = "presidentialdigs"
+  cost_center = "cc-001"
+  managed_by  = "terraform"
+}
+
+# Shared VPC Configuration (set to true if using shared VPC)
+enable_shared_vpc_host   = false
+enable_shared_vpc_service = false
+# shared_vpc = "host-project-id"  # Uncomment and set if using shared VPC
+
+# Network Configuration
+network_name = "vpc-main"
+subnets = [
+  {
+    name          = "subnet-main"
+    ip_cidr_range = "10.10.0.0/24"
+    region        = "us-central1"
+    private_ip_google_access = true
+  }
+]
+
+secondary_ranges = {
+  "subnet-main" = [
+    {
+      range_name    = "pods"
+      ip_cidr_range = "10.20.0.0/20"
+    },
+    {
+      range_name    = "services"
+      ip_cidr_range = "10.30.0.0/24"
+    }
+  ]
+}
+
+# Network Features
+enable_cloud_nat = true
+enable_cloud_router = true
+enable_firewall_rules = true
+
+# Security Configuration (WARNING: These are open for development - restrict for production)
+allowed_ssh_networks = ["0.0.0.0/0"]   # Restrict to your IP range in production
+allowed_http_networks = ["0.0.0.0/0"]  # Restrict to your IP range in production
+
+# IAM Configuration
+enable_gke_service_account = true
+enable_ci_service_account = true
+enable_monitoring_service_account = false
+
+gke_service_account_name = "gke-node-sa"
+ci_service_account_name = "github-actions-sa"
+monitoring_service_account_name = "monitoring-sa"
+
+# GKE Configuration
+cluster_name = "dev-cluster"
+enable_private_nodes = true
+enable_private_endpoint = false  # Set to true for production
+master_ipv4_cidr_block = "172.16.0.0/28"
+
+# GKE Features
+enable_network_policy = true
+enable_workload_identity = true
+enable_shielded_nodes = true
+enable_legacy_abac = false
+enable_kubernetes_dashboard = false
+enable_cloud_logging = true
+enable_cloud_monitoring = true
+
+# Node Pool Configuration (Cost-optimized for development)
+node_pools = [
+  {
+    name               = "default-pool"
+    machine_type       = "e2-standard-2"  # Cost-optimized machine type
+    disk_size_gb       = 50
+    disk_type          = "pd-standard"
+    initial_node_count = 1
+    min_count          = 1
+    max_count          = 3
+    max_surge          = 1
+    max_unavailable    = 0
+    preemptible        = true  # Cost optimization for development
+    spot               = false
+    labels = {
+      pool = "default"
+    }
+    taints = []
+  }
+]
+
+# Maintenance Policy
+maintenance_policy = {
+  daily_maintenance_window = {
+    start_time = "03:00"
+  }
+}
+
+# Release Channel
+release_channel = "regular"  # Options: rapid, regular, stable
+
+# Kubernetes Version (leave as null to use default)
+kubernetes_version = null
