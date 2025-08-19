@@ -30,32 +30,41 @@ This infrastructure provides:
 
 ## 🚀 Quick Start
 
-### 1. Clone and Setup
-```bash
-git clone <repository-url>
-cd gcp-project-setup
-make install
-```
+### Option 1: GitHub Actions (Recommended)
+1. **Setup GitHub Actions** (one-time setup):
+   ```bash
+   make setup-github-actions
+   ```
+2. **Configure GitHub Secrets** (see [GitHub Actions Setup Guide](docs/GITHUB_ACTIONS_SETUP.md))
+3. **Deploy via PR**: Create a branch, make changes, create PR to trigger deployment
 
-### 2. Configure Environment
-```bash
-cd infra/envs/dev
-cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your org_id and billing_account
-```
+### Option 2: Local Development
+1. **Clone and Setup**:
+   ```bash
+   git clone <repository-url>
+   cd gcp-project-setup
+   make install
+   ```
 
-### 3. Bootstrap Backend
-```bash
-make bootstrap
-# Follow prompts to enter project ID and bucket name
-```
+2. **Configure Environment**:
+   ```bash
+   cd infra/envs/dev
+   cp terraform.tfvars.example terraform.tfvars
+   # Edit terraform.tfvars with your org_id and billing_account
+   ```
 
-### 4. Deploy Infrastructure
-```bash
-make init
-make plan
-make apply
-```
+3. **Bootstrap Backend**:
+   ```bash
+   make bootstrap
+   # Follow prompts to enter project ID and bucket name
+   ```
+
+4. **Deploy Infrastructure**:
+   ```bash
+   make init
+   make plan
+   make apply
+   ```
 
 ## 💰 Cost Optimization
 

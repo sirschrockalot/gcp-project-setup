@@ -41,6 +41,23 @@ bootstrap: ## Bootstrap the GCS backend bucket
 	read -p "Enter bucket name: " bucket_name; \
 	./scripts/bootstrap_backend.sh $$project_id $$bucket_name
 
+bootstrap-apis: ## Enable Service Usage API (required before first Terraform run)
+	@echo "Enabling Service Usage API..."
+	@read -p "Enter project ID: " project_id; \
+	./scripts/enable_service_usage_api.sh $$project_id
+
+bootstrap-terraform: ## Bootstrap Service Usage API using Terraform
+	@echo "Bootstrapping Service Usage API with Terraform..."
+	cd infra/envs/dev && terraform apply -target=google_project_service.service_usage
+
+install-gcloud: ## Install Google Cloud CLI
+	@echo "Installing Google Cloud CLI..."
+	./scripts/install-gcloud.sh
+
+setup-github-actions: ## Setup GitHub Actions with Workload Identity Federation
+	@echo "Setting up GitHub Actions..."
+	./scripts/setup-github-actions.sh
+
 init: ## Initialize Terraform
 	@echo "Initializing Terraform..."
 	cd infra/envs/dev && terraform init

@@ -1,4 +1,5 @@
 # Project Factory Module
+# This module creates the GCP project and enables required APIs
 module "project" {
   source = "../../modules/project"
   

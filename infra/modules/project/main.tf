@@ -23,6 +23,7 @@ variable "apis" {
   description = "List of APIs to enable on the project"
   type        = list(string)
   default = [
+    "serviceusage.googleapis.com",  # Must be first - enables API management
     "compute.googleapis.com",
     "container.googleapis.com",
     "run.googleapis.com",
@@ -87,27 +88,46 @@ resource "google_project" "main" {
   }
 }
 
+# Enable Service Usage API first (required for managing other APIs)
+resource "google_project_service" "service_usage" {
+  project = google_project.main.project_id
+  service = "serviceusage.googleapis.com"
+
+  disable_dependent_services = true
+  disable_on_destroy         = false
+
+  # Add a small delay to ensure the API is fully enabled
+  provisioner "local-exec" {
+    command = "sleep 30"
+  }
+}
+
+# Enable all other APIs (excluding serviceusage.googleapis.com which is handled above)
 resource "google_project_service" "enabled_apis" {
-  for_each = toset(var.apis)
+  for_each = toset([for api in var.apis : api if api != "serviceusage.googleapis.com"])
   project  = google_project.main.project_id
   service  = each.value
 
   disable_dependent_services = true
   disable_on_destroy         = false
+
+  depends_on = [google_project_service.service_usage]
 }
-
-
 
 # Shared VPC configuration
 resource "google_compute_shared_vpc_host_project" "shared_vpc_host" {
   count   = var.enable_shared_vpc_host ? 1 : 0
   project = google_project.main.project_id
+  
+  depends_on = [google_project_service.enabled_apis]
 }
 
 resource "google_compute_shared_vpc_service_project" "shared_vpc_service" {
   count   = var.enable_shared_vpc_service ? 1 : 0
   host_project = var.shared_vpc
   service_project = google_project.main.project_id
+  
+  depends_on = [google_project_service.enabled_apis]
 }
 
 output "project_id" {
