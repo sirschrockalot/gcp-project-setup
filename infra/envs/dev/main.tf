@@ -1,5 +1,6 @@
 # Project Factory Module
 # This module creates the GCP project and enables required APIs
+# Triggering deployment workflow
 module "project" {
   source = "../../modules/project"
   
