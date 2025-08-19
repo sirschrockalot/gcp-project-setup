@@ -59,7 +59,7 @@ allowed_http_networks = ["0.0.0.0/0"]  # Restrict to your IP range in production
 
 # IAM Configuration
 enable_gke_service_account = true
-enable_ci_service_account = false  # Disabled - managed manually via setup script
+enable_ci_service_account = true   # Re-enabled - needed for IAM bindings
 enable_monitoring_service_account = false
 
 gke_service_account_name = "gke-node-sa"

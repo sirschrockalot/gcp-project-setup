@@ -103,7 +103,7 @@ resource "google_service_account" "ci" {
 }
 
 resource "google_project_iam_member" "ci_roles" {
-  for_each = toset(var.ci_service_account_roles)
+  for_each = var.enable_ci_service_account ? toset(var.ci_service_account_roles) : toset([])
   project  = var.project_id
   role     = each.value
   member   = "serviceAccount:${google_service_account.ci[0].email}"
