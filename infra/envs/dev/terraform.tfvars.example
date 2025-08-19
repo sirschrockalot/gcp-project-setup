@@ -110,7 +110,7 @@ maintenance_policy = {
 }
 
 # Release Channel
-release_channel = "regular"  # Options: rapid, regular, stable
+release_channel = "REGULAR"  # Options: RAPID, REGULAR, STABLE
 
 # Kubernetes Version (leave as null to use default)
 kubernetes_version = null
