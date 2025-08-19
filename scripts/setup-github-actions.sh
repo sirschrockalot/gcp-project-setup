@@ -60,8 +60,8 @@ get_user_input() {
     read -p "Project ID [$CURRENT_PROJECT]: " PROJECT_ID
     PROJECT_ID=${PROJECT_ID:-$CURRENT_PROJECT}
     
-    read -p "GitHub repository (format: owner/repo) [joelschrock/gcp-project-setup]: " GITHUB_REPO
-    GITHUB_REPO=${GITHUB_REPO:-"joelschrock/gcp-project-setup"}
+    read -p "GitHub repository (format: owner/repo) [sirschrockalot/gcp-project-setup]: " GITHUB_REPO
+    GITHUB_REPO=${GITHUB_REPO:-"sirschrockalot/gcp-project-setup"}
     
     read -p "Workload Identity Pool ID [github-actions-pool]: " POOL_ID
     POOL_ID=${POOL_ID:-"github-actions-pool"}
@@ -132,9 +132,9 @@ grant_roles() {
     local roles=(
         "roles/editor"
         "roles/serviceusage.serviceUsageAdmin"
-        "roles/resourcemanager.projectCreator"
         "roles/billing.user"
         "roles/storage.admin"
+        "roles/iam.serviceAccountAdmin"
     )
     
     for role in "${roles[@]}"; do
