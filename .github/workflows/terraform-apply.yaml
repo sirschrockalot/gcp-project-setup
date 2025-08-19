@@ -57,6 +57,9 @@ jobs:
           cp terraform.tfvars.example terraform.tfvars
           sed -i "s/^org_id\s*=.*/org_id = \"${{ secrets.ORG_ID }}\"/" terraform.tfvars
           sed -i "s/^billing_account\s*=.*/billing_account = \"${{ secrets.BILLING_ACCOUNT }}\"/" terraform.tfvars
+          # Ensure labels use underscores instead of hyphens
+          sed -i 's/cost-center/cost_center/g' terraform.tfvars
+          sed -i 's/managed-by/managed_by/g' terraform.tfvars
 
       - name: "Terraform Init"
         working-directory: ${{ env.TF_WORKING_DIR }}
