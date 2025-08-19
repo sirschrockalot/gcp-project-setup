@@ -194,12 +194,13 @@ output "monitoring_service_account_email" {
   value       = var.enable_monitoring_service_account ? google_service_account.monitoring[0].email : null
 }
 
-output "workload_identity_pool_id" {
-  description = "ID of the workload identity pool (manually created)"
-  value       = "github-actions-pool"
-}
+# Workload Identity outputs removed - resources are managed manually
+# output "workload_identity_pool_id" {
+#   description = "ID of the workload identity pool (manually created)"
+#   value       = "github-actions-pool"
+# }
 
-output "workload_identity_provider_id" {
-  description = "ID of the workload identity provider (manually created)"
-  value       = "github-actions-provider"
-}
+# output "workload_identity_provider_id" {
+#   description = "ID of the workload identity provider (manually created)"
+#   value       = "github-identity-provider"
+# }

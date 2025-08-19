@@ -61,15 +61,16 @@ output "monitoring_service_account_email" {
   value       = module.iam.monitoring_service_account_email
 }
 
-output "workload_identity_pool_id" {
-  description = "ID of the workload identity pool"
-  value       = module.iam.workload_identity_pool_id
-}
+# Workload Identity outputs removed - resources are managed manually
+# output "workload_identity_pool_id" {
+#   description = "ID of the workload identity pool"
+#   value       = module.iam.workload_identity_pool_id
+# }
 
-output "workload_identity_provider_id" {
-  description = "ID of the workload identity provider"
-  value       = module.iam.workload_identity_provider_id
-}
+# output "workload_identity_provider_id" {
+#   description = "ID of the workload identity provider"
+#   value       = module.iam.workload_identity_provider_id
+# }
 
 # GKE outputs
 output "cluster_id" {
@@ -105,10 +106,11 @@ output "node_pool_versions" {
   value       = module.gke.node_pool_versions
 }
 
-output "workload_identity_pool" {
-  description = "The workload identity pool"
-  value       = module.gke.workload_identity_pool
-}
+# Workload Identity Pool output removed - managed manually
+# output "workload_identity_pool" {
+#   description = "The workload identity pool"
+#   value       = module.gke.workload_identity_pool
+# }
 
 # Artifact Registry outputs
 output "docker_repository_id" {
