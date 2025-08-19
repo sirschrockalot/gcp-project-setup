@@ -128,45 +128,51 @@ resource "google_project_iam_member" "monitoring_roles" {
 // Removed custom role to avoid invalid permission errors; built-in roles cover needs
 
 # Workload Identity Pool for GitHub Actions OIDC
-resource "google_iam_workload_identity_pool" "github_actions" {
-  count                  = var.enable_ci_service_account ? 1 : 0
-  workload_identity_pool_id = "github-actions-pool"
-  project                = var.project_id
-  display_name           = "GitHub Actions Pool"
-  description            = "Identity pool for GitHub Actions OIDC"
-}
+# Note: These resources are created manually via the setup script
+# to avoid permission conflicts during initial deployment
+# 
+# The existing Workload Identity Federation setup allows GitHub Actions
+# to authenticate using the configured service account
 
-resource "google_iam_workload_identity_pool_provider" "github_actions" {
-  count                           = var.enable_ci_service_account ? 1 : 0
-  workload_identity_pool_id       = google_iam_workload_identity_pool.github_actions[0].workload_identity_pool_id
-  workload_identity_pool_provider_id = "github-actions-provider"
-  project                         = var.project_id
-  display_name                    = "GitHub Actions Provider"
-  description                     = "OIDC provider for GitHub Actions"
-  
-  oidc {
-    issuer_uri        = "https://token.actions.githubusercontent.com"
-    allowed_audiences = ["https://token.actions.githubusercontent.com"]
-  }
-  
-  attribute_mapping = {
-    "google.subject"       = "assertion.sub"
-    "attribute.actor"      = "assertion.actor"
-    "attribute.repository" = "assertion.repository"
-    "attribute.ref"        = "assertion.ref"
-  }
+# resource "google_iam_workload_identity_pool" "github_actions" {
+#   count                  = var.enable_ci_service_account ? 1 : 0
+#   workload_identity_pool_id = "github-actions-pool"
+#   project                = var.project_id
+#   display_name           = "GitHub Actions Pool"
+#   description            = "Identity pool for GitHub Actions OIDC"
+# }
 
-  attribute_condition = "attribute.repository == 'sirschrockalot/gcp-project-setup'"
-}
+# resource "google_iam_workload_identity_pool_provider" "github_actions" {
+#   count                           = var.enable_ci_service_account ? 1 : 0
+#   workload_identity_pool_id       = google_iam_workload_identity_pool.github_actions[0].workload_identity_pool_id
+#   workload_identity_pool_provider_id = "github-actions-provider"
+#   project                         = var.project_id
+#   display_name                    = "GitHub Actions Provider"
+#   description                     = "OIDC provider for GitHub Actions"
+#   
+#   oidc {
+#     issuer_uri        = "https://token.actions.githubusercontent.com"
+#     allowed_audiences = ["https://token.actions.githubusercontent.com"]
+#   }
+#   
+#   attribute_mapping = {
+#     "google.subject"       = "assertion.sub"
+#     "attribute.actor"      = "assertion.actor"
+#     "attribute.repository" = "assertion.repository"
+#     "attribute.ref"        = "assertion.ref"
+#   }
 
-resource "google_service_account_iam_binding" "workload_identity_binding" {
-  count              = var.enable_ci_service_account ? 1 : 0
-  service_account_id = google_service_account.ci[0].name
-  role               = "roles/iam.workloadIdentityUser"
-  members = [
-    "principalSet://iam.googleapis.com/projects/${data.google_project.current.number}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.github_actions[0].workload_identity_pool_id}/attribute.repository/sirschrockalot/gcp-project-setup"
-  ]
-}
+#   attribute_condition = "attribute.repository == 'sirschrockalot/gcp-project-setup'"
+# }
+
+# resource "google_service_account_iam_binding" "workload_identity_binding" {
+#   count              = var.enable_ci_service_account ? 1 : 0
+#   service_account_id = google_service_account.ci[0].name
+#   role               = "roles/iam.workloadIdentityUser"
+#   members = [
+#     "principalSet://iam.googleapis.com/projects/${data.google_project.current.number}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.github_actions[0].workload_identity_pool_id}/attribute.repository/sirschrockalot/gcp-project-setup"
+#   ]
+# }
 
 data "google_project" "current" {
   project_id = var.project_id
@@ -189,11 +195,11 @@ output "monitoring_service_account_email" {
 }
 
 output "workload_identity_pool_id" {
-  description = "ID of the workload identity pool"
-  value       = var.enable_ci_service_account ? google_iam_workload_identity_pool.github_actions[0].workload_identity_pool_id : null
+  description = "ID of the workload identity pool (manually created)"
+  value       = "github-actions-pool"
 }
 
 output "workload_identity_provider_id" {
-  description = "ID of the workload identity provider"
-  value       = var.enable_ci_service_account ? google_iam_workload_identity_pool_provider.github_actions[0].workload_identity_pool_provider_id : null
+  description = "ID of the workload identity provider (manually created)"
+  value       = "github-actions-provider"
 }
