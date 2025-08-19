@@ -1,4 +1,4 @@
-# GCP Project Setup - Presidential Digs
+# GCP Project Setup - Presidential Digs Google Project
 
 A production-ready, cost-optimized Google Cloud Platform infrastructure setup using Terraform, designed for development environments with GKE, networking, and IAM.
 

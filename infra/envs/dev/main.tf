@@ -146,6 +146,7 @@ resource "google_secret_manager_secret_iam_member" "secret_accessor" {
 
 # Cloud Build trigger for CI/CD (optional)
 resource "google_cloudbuild_trigger" "build_trigger" {
+  count       = 0
   name        = "presidentialdigs-build"
   description = "Build trigger for Presidential Digs application"
   

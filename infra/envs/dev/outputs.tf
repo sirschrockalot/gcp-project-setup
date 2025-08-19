@@ -136,8 +136,8 @@ output "app_secrets_id" {
 
 # Cloud Build outputs
 output "build_trigger_id" {
-  description = "The ID of the build trigger"
-  value       = google_cloudbuild_trigger.build_trigger.id
+  description = "The ID of the build trigger (null if disabled)"
+  value       = length(google_cloudbuild_trigger.build_trigger) > 0 ? google_cloudbuild_trigger.build_trigger[0].id : null
 }
 
 # Connection information
